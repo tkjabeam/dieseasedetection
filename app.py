@@ -15,7 +15,7 @@ model = load_model(model_path)
 
 # Define a function to preprocess the image
 def preprocess_image(img_path):
-    img = image.load_img(img_path, target_size=(244, 244))
+    img = image.load_img(img_path, target_size=(224, 224))  # Fixed typo in image size
     img_array = image.img_to_array(img)
     img_array = np.expand_dims(img_array, axis=0)
     img_array = tf.keras.applications.mobilenet_v2.preprocess_input(img_array)
@@ -42,7 +42,7 @@ def upload_image():
         return jsonify({'error': 'No selected file'}), 400
 
     if file:
-        file_path = 'uploaded_image.jpg'
+        file_path = os.path.join('/tmp', file.filename)  # Save to /tmp directory
         file.save(file_path)
 
         # Preprocess the image
@@ -55,4 +55,4 @@ def upload_image():
         return jsonify({'prediction': predicted_class})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))  # Update host and port for Render
